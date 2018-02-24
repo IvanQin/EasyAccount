@@ -28,3 +28,12 @@ npm test
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+### Tech stack
+- Frontend framework: Vue.js, vue-cli
+- CSS framework: [Element-UI](http://element.eleme.io/)
+
+### Problems encountered
+
+- If there exists some error like 'export declaration are not support by current javascript' in WebStorm, change the Javascript version in 'Preference' but not in 'default' setting!
+- How to use element-ui? `Vue.use(ElementUI)` `import 'element-ui/lib/theme-chalk/index.css'` for global import.
