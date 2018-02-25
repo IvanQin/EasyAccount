@@ -35,7 +35,8 @@
                     </el-row>
                     <el-row>
                         <el-col :span="8">
-                            <el-button type="primary" icon="el-icon-circle-plus" @click="addRecords = true">Add record</el-button>
+                            <el-button type="primary" icon="el-icon-circle-plus" @click="showAddRecordsDialog = true">Add record
+                            </el-button>
                         </el-col>
                     </el-row>
                     <el-row>
@@ -44,29 +45,29 @@
                                 style="width: 100%">
                             <el-table-column type="expand">
 
-                                    <el-form label-position="left" inline class="demo-table-expand" slot-scope="props">
-                                        <el-form-item label="ID">
-                                            <span>{{ props.row.id }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Event">
-                                            <span>{{ props.row.event }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Total Amount">
-                                            <span>{{ props.row.totalAmount }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="People">
-                                            <span>{{ props.row.people }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Avg Amount">
-                                            <span>{{ props.row.avgAmount }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Time">
-                                            <span>{{ props.row.time }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Description">
-                                            <span>{{ props.row.description }}</span>
-                                        </el-form-item>
-                                    </el-form>
+                                <el-form label-position="left" inline class="demo-table-expand" slot-scope="props">
+                                    <el-form-item label="ID">
+                                        <span>{{ props.row.id }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="Event">
+                                        <span>{{ props.row.event }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="Total Amount">
+                                        <span>{{ props.row.totalAmount }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="People">
+                                        <span>{{ props.row.people }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="Avg Amount">
+                                        <span>{{ props.row.avgAmount }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="Time">
+                                        <span>{{ props.row.time }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="Comment">
+                                        <span>{{ props.row.comment }}</span>
+                                    </el-form-item>
+                                </el-form>
 
                             </el-table-column>
                             <el-table-column
@@ -94,30 +95,58 @@
                         </el-table>
 
                     </el-row>
-                    <el-dialog title="Add records" :visible.sync="addRecords">
-                        <el-form :model="addRecordsTemplate">
-                            <el-form-item label="Event" label-width="120px">
-                                <el-input v-model="addRecordsTemplate.event" auto-complete="off"></el-input>
+                    <el-dialog title="Add records" :visible.sync="showAddRecordsDialog">
+                        <el-form :model="addRecordsTemplate" :rules="addRecordsTemplateRules">
+                            <el-form-item label="Event" label-width="120px" prop="event">
+                                <el-input v-model="addRecordsTemplate.event" auto-complete="off"
+                                          placeholder="Brief description of event"></el-input>
                             </el-form-item>
-                            <el-form-item label="Total amount" label-width="120px">
+                            <el-form-item label="Total amount" label-width="120px" prop="totalAmount">
                                 <el-input
                                         placeholder="Total amount of money spent"
-                                        suffix-icon="el-icon-date"
-                                        v-model="addRecordsTemplate.totalAmount">
+                                        suffix-icon="el-icon-info"
+                                        v-model.number="addRecordsTemplate.totalAmount">
                                 </el-input>
                             </el-form-item>
-                            <el-form-item label="People involved" label-width="120px">
-                                <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">Select all</el-checkbox>
-                                <div style="margin: 15px 0;"></div>
-                                <el-checkbox-group v-model="addRecordsTemplate.checkedPeople" @change="handleCheckedCitiesChange">
-                                    <el-checkbox v-for="p in people" :label="p" :key="p">{{p}}</el-checkbox>
-                                </el-checkbox-group>
-                                {{checkedPeople}}
+
+                            <el-form-item label="People" label-width="120px" prop="people">
+
+                                <el-select v-model="addRecordsTemplate.checkedPeople" multiple placeholder="Please choose">
+                                    <el-option v-for="p in people" :label="p" :key="p" :value="p"></el-option>
+
+                                </el-select>
+                            </el-form-item>
+
+                            <!--el-form-item label="Demo" label-width="120px" prop="demo">
+                                <el-select v-model="value5" multiple placeholder="请选择">
+                                    <el-option
+                                            v-for="item in options"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                    </el-option>
+                                </el-select>
+                                {{value5}}
+                            </el-form-item-->
+                            <el-form-item label="Date" label-width="120px" prop="date">
+                                <el-date-picker
+                                        v-model="addRecordsTemplate.date"
+                                        type="date"
+                                        placeholder="choose date">
+                                </el-date-picker>
+                            </el-form-item>
+                            <el-form-item label="Comment" label-width="120px" prop="comment">
+                                <el-input
+                                        type="textarea"
+                                        :rows="2"
+                                        placeholder="Enter the comments"
+                                        v-model="textarea">
+                                </el-input>
                             </el-form-item>
                         </el-form>
                         <div slot="footer" class="dialog-footer">
-                            <el-button @click="addRecords = false">Cancel</el-button>
-                            <el-button type="primary" @click="addRecords = false">Confirm</el-button>
+                            <el-button @click="cancelAddRecords()">Cancel</el-button>
+                            <el-button type="primary" @click="submitAddRecords()">Confirm</el-button>
                         </div>
                     </el-dialog>
 
@@ -151,9 +180,48 @@
                 }],
                 value: '',
                 active: 0,
-                records:[{id:1,event:"ACW",totalAmount:100,people:"Yifan",avgAmount:10,time:"2018-1-1",description:"This is a demo"}],
-                addRecords: false,
+                records: [{
+                    id: 1,
+                    event: "ACW",
+                    totalAmount: 100,
+                    people: "Yifan",
+                    avgAmount: 10,
+                    time: "2018-1-1",
+                    comment: "This is a demo"
+                }],
+                showAddRecordsDialog: false,
                 addRecordsTemplate: {
+                    checkedPeople: [],
+                    date: '',
+                    totalAmount:'',
+                    event:'',
+                    comment:''
+                },
+                people: ['Yifan Qin', 'Yuting Shi1', 'Yi Wang', 'Yifan Qin1', 'Yuting Shi', 'Yi Wang1'],
+                addRecordsTemplateRules: {
+                    event: [{
+                        required: true,
+                        message: "Event description cannot be empty.",
+                        trigger: 'blur'
+                    }],
+                    totalAmount: [{
+                        required: true, message: 'Total amount of money must be entered.'
+                    }, {
+                        type: 'number', message: 'The amount must be number.'
+                    }],
+                    people: [
+                        {required: true, message: 'People involved cannot be empty.', trigger: 'blur'}
+                        //TODO (to be fixed)
+                        // actually the trigger should be 'change', but I cannot fix the bug that even if I have selected
+                        // people, it shows the error message as well.
+                    ],
+
+
+                },
+                rules: {
+
+                },
+                ruleForm: {
                     name: '',
                     region: '',
                     date1: '',
@@ -161,31 +229,22 @@
                     delivery: false,
                     type: [],
                     resource: '',
-                    desc: '',
-                    checkedPeople:[],
+                    desc: ''
                 },
-
-                isIndeterminate: true,
-                checkAll:false,
-                people:['Yifan Qin','Yuting Shi','Yi Wang','Yifan Qin','Yuting Shi','Yi Wang']
-
-
 
             }
         },
         methods: {
-            next() {
-                if (this.active++ > 2) this.active = 0;
+            submitAddRecords(){
+                this.showAddRecordsDialog = false;
+
             },
-            handleCheckAllChange(val) {
-                this.checkedPeople = val ? this.people : [];
-                this.isIndeterminate = false;
-            },
-            handleCheckedCitiesChange(value) {
-                let checkedCount = value.length;
-                this.checkAll = checkedCount === this.people.length;
-                this.isIndeterminate = checkedCount > 0 && checkedCount < this.people.length;
+            cancelAddRecords(){
+                this.showAddRecordsDialog = false;
+                this.addRecordsTemplate = {}
+
             }
+
             //TODO(if confirmed, the records will be sent to backend and template will be refreshed.
 
         }
@@ -220,9 +279,14 @@
     .demo-table-expand label {
         color: #99a9bf;
     }
+
     .demo-table-expand .el-form-item {
         margin-right: 0;
         margin-bottom: 0;
         width: 50%;
+    }
+
+    el-form-item {
+        text-align: left;
     }
 </style>
