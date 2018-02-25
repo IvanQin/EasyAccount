@@ -36,4 +36,12 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 ### Problems encountered
 
 - If there exists some error like 'export declaration are not support by current javascript' in WebStorm, change the Javascript version in 'Preference' but not in 'default' setting!
-- How to use element-ui? `Vue.use(ElementUI)` `import 'element-ui/lib/theme-chalk/index.css'` for global import.
+
+### How to use
+- How to use element-ui? 
+    + `Vue.use(ElementUI)` `import 'element-ui/lib/theme-chalk/index.css'` for global import.
+- How to use axios? 
+    + `import axios from 'axios'`
+    + `Vue.prototype.$http = axios`
+    + `axios.defaults.baseURL = 'http://localhost:3000'`
+    + Type the statements above in **main.js**
