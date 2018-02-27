@@ -35,7 +35,8 @@
                     </el-row>
                     <el-row>
                         <el-col :span="8">
-                            <el-button type="primary" icon="el-icon-circle-plus" @click="showAddRecordsDialog = true">Add record
+                            <el-button type="primary" icon="el-icon-circle-plus" @click="showAddRecordsDialog = true">
+                                Add record
                             </el-button>
                         </el-col>
                     </el-row>
@@ -62,7 +63,7 @@
                                         <span>{{ props.row.avgAmount }}</span>
                                     </el-form-item>
                                     <el-form-item label="Time">
-                                        <span>{{ props.row.time }}</span>
+                                        <span>{{ props.row.time | formatDate }}</span>
                                     </el-form-item>
                                     <el-form-item label="Comment">
                                         <span>{{ props.row.comment }}</span>
@@ -111,7 +112,8 @@
 
                             <el-form-item label="People" label-width="120px" prop="people">
 
-                                <el-select v-model="addRecordsTemplate.checkedPeople" multiple placeholder="Please choose">
+                                <el-select v-model="addRecordsTemplate.involvedPeople" multiple
+                                           placeholder="Please choose">
                                     <el-option v-for="p in people" :label="p" :key="p" :value="p"></el-option>
 
                                 </el-select>
@@ -130,7 +132,7 @@
                             </el-form-item-->
                             <el-form-item label="Date" label-width="120px" prop="date">
                                 <el-date-picker
-                                        v-model="addRecordsTemplate.date"
+                                        v-model="addRecordsTemplate.time"
                                         type="date"
                                         placeholder="choose date">
                                 </el-date-picker>
@@ -158,10 +160,14 @@
 </template>
 
 <script>
+    const utils = require('../utils/utils');
+
     export default {
         name: 'HelloWorld',
         data () {
             return {
+                roomId: '1234',
+                author: 'Yifan Qin',
                 options: [{
                     value: '选项1',
                     label: '黄金糕'
@@ -191,11 +197,11 @@
                 }],
                 showAddRecordsDialog: false,
                 addRecordsTemplate: {
-                    checkedPeople: [],
-                    date: '',
-                    totalAmount:'',
-                    event:'',
-                    comment:''
+                    involvedPeople: [],
+                    time: '',
+                    totalAmount: '',
+                    event: '',
+                    comment: ''
                 },
                 people: ['Yifan Qin', 'Yuting Shi1', 'Yi Wang', 'Yifan Qin1', 'Yuting Shi', 'Yi Wang1'],
                 addRecordsTemplateRules: {
@@ -218,9 +224,7 @@
 
 
                 },
-                rules: {
-
-                },
+                rules: {},
                 ruleForm: {
                     name: '',
                     region: '',
@@ -236,18 +240,118 @@
         },
         methods: {
             submitAddRecords(){
-                this.showAddRecordsDialog = false;
 
+//                let test = {
+//                    dbName: "test",
+//                    collectionName: "record",
+//                    operation: 2, // search
+//                    document: {
+//                        roomId: "1234",
+//                        author: "Yifan Qin",
+//                        event: "Lady M",
+//                        totalAmount: 9.0,
+//                        involvedPeople: ["Yifan Qin", "Yi Wang", "Yuling Guan"],
+//                        averageAmount: 3.0,
+//                        time: Date.UTC(2018, 1, 2), // Notice that 1 here represents February
+//                        comment: "Very nice!"
+//                    },
+//                    projectionDoc:{
+//                        roomId:1,
+//                        event:1
+//                    }
+//                };
+
+                let wrappedAddRecordsTemplate = {
+                    document: this.wrapRecordsTemplate(this.addRecordsTemplate)
+                };
+                let submitAddRecordsRequest = utils.getDbOperationTemplate(0, 'record', wrappedAddRecordsTemplate);
+                this.$http.post('/db', submitAddRecordsRequest).then(res => {
+                    let receiveData = res.data;
+
+                    if (receiveData == 'Success!') {
+                        this.$message({
+                            type: 'success', // info,success,warning,error
+                            message: "Success!"
+                        });
+                    }
+                    this.refreshRecords();
+                    this.addRecordsTemplate = {};
+                }).catch(err => {
+                    console.log(err);
+                    this.$message({
+                        type: 'error', // info,success,warning,error
+                        message: err
+                    });
+                });
+                this.showAddRecordsDialog = false;
             },
             cancelAddRecords(){
                 this.showAddRecordsDialog = false;
-                this.addRecordsTemplate = {}
+                this.addRecordsTemplate = {};
+                this.$message({
+                    type: 'warning', // info,success,warning,error
+                    message: 'Cancelled.'
+                });
+
+            },
+            wrapRecordsTemplate(recordsTemplate){
+                recordsTemplate['roomId'] = this.roomId;
+                recordsTemplate['author'] = this.author;
+                return recordsTemplate;
+            },
+            refreshRecords(){
+                let wrappedFetchRecordsTemplate = {
+                    document: this.wrapRecordsTemplate({}),
+                    projectionDoc: {
+                        event: 1,
+                        totalAmount: 1,
+                        involvedPeople: 1,
+                        averageAmount: 1,
+                        time: 1,
+                        comment: 1
+                    }
+
+                };
+                let fetchRecordsRequest = utils.getDbOperationTemplate(2, 'record', wrappedFetchRecordsTemplate)
+                this.$http.post('/db', fetchRecordsRequest).then(res => {
+                    let receivedData = res.data;
+                    this.records = [];
+                    for (let i in receivedData) {
+                        if (receivedData.hasOwnProperty(i)) {
+                            let data = receivedData[i];
+                            let tmpRecord = {
+                                id: i,
+                                event: data.event,
+                                totalAmount: data.totalAmount,
+                                people: data.involvedPeople,
+                                avgAmount: data.totalAmount / data.involvedPeople.length,
+                                time: data.time,
+                                comment: data.comment
+                            };
+                            this.records.push(tmpRecord);
+                        }
+                    }
+
+                }).catch(err => console.log(err));
+
 
             }
 
+
             //TODO(if confirmed, the records will be sent to backend and template will be refreshed.
 
+        },
+        mounted: function(){
+            this.refreshRecords();
+        },
+        filters: {
+            formatDate (timeString){
+                let d = new Date(Date.parse(timeString));
+                return d.toLocaleDateString();
+            }
         }
+
+
     }
 </script>
 
