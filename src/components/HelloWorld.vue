@@ -19,18 +19,18 @@
                         </el-col>
                     </el-row>
                     <el-row :gutter="20">
-                        <el-col :span="8">
-                            <el-select v-model="value" placeholder="请选择">
+                        <el-col :span="10">
+                            <el-select v-model="tmpAuthor" placeholder="Tell us who you are">
                                 <el-option
-                                        v-for="item in options"
-                                        :key="item.value"
-                                        :label="item.label"
-                                        :value="item.value">
+                                        v-for="p in people"
+                                        :key="p.id"
+                                        :label="p"
+                                        :value="p">
                                 </el-option>
                             </el-select>
                         </el-col>
                         <el-col :span="8">
-                            <el-button type="success">Confirm</el-button>
+                            <el-button type="success" @click="confirmAuthor">Confirm</el-button>
                         </el-col>
                     </el-row>
                     <el-row>
@@ -56,8 +56,13 @@
                                     <el-form-item label="Total Amount">
                                         <span>{{ props.row.totalAmount }}</span>
                                     </el-form-item>
-                                    <el-form-item label="People">
+                                    <!--el-form-item label="People">
                                         <span>{{ props.row.people }}</span>
+                                    </el-form-item-->
+                                    <el-form-item label="People">
+                                        <span>
+                                            <el-tag v-for="p in props.row.people" :key="p.id" style="margin: 0 2px">{{p}}</el-tag>
+                                        </span>
                                     </el-form-item>
                                     <el-form-item label="Avg Amount">
                                         <span>{{ props.row.avgAmount }}</span>
@@ -92,6 +97,22 @@
                                     label="People"
                                     width="180"
                             >
+                                <template slot-scope="props">
+                                    <span><el-tag v-for="p in props.row.people" :key="p.id" style="margin: 2px 2px">{{p}}</el-tag></span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="Operation">
+                                <template slot-scope="props">
+                                    <el-button
+                                            size="mini"
+                                            @click="handleEdit(props.$index, props.row)" style="margin: 2px 2px"> Edit
+                                    </el-button>
+                                    <el-button
+                                            size="mini"
+                                            type="danger"
+                                            @click="handleDelete(props.$index, props.row)" style="margin: 2px 2px">Delete
+                                    </el-button>
+                                </template>
                             </el-table-column>
                         </el-table>
 
@@ -142,7 +163,7 @@
                                         type="textarea"
                                         :rows="2"
                                         placeholder="Enter the comments"
-                                        v-model="textarea">
+                                        v-model="addRecordsTemplate.comment">
                                 </el-input>
                             </el-form-item>
                         </el-form>
@@ -166,35 +187,13 @@
         name: 'HelloWorld',
         data () {
             return {
-                roomId: '1234',
-                author: 'Yifan Qin',
-                options: [{
-                    value: '选项1',
-                    label: '黄金糕'
-                }, {
-                    value: '选项2',
-                    label: '双皮奶'
-                }, {
-                    value: '选项3',
-                    label: '蚵仔煎'
-                }, {
-                    value: '选项4',
-                    label: '龙须面'
-                }, {
-                    value: '选项5',
-                    label: '北京烤鸭'
-                }],
-                value: '',
+                roomId: '',
+                roomCreateTime: '',
+                author: '',
+                tmpAuthor: '',
+
                 active: 0,
-                records: [{
-                    id: 1,
-                    event: "ACW",
-                    totalAmount: 100,
-                    people: "Yifan",
-                    avgAmount: 10,
-                    time: "2018-1-1",
-                    comment: "This is a demo"
-                }],
+                records: [],
                 showAddRecordsDialog: false,
                 addRecordsTemplate: {
                     involvedPeople: [],
@@ -203,7 +202,7 @@
                     event: '',
                     comment: ''
                 },
-                people: ['Yifan Qin', 'Yuting Shi1', 'Yi Wang', 'Yifan Qin1', 'Yuting Shi', 'Yi Wang1'],
+                people: [],
                 addRecordsTemplateRules: {
                     event: [{
                         required: true,
@@ -240,26 +239,6 @@
         },
         methods: {
             submitAddRecords(){
-
-//                let test = {
-//                    dbName: "test",
-//                    collectionName: "record",
-//                    operation: 2, // search
-//                    document: {
-//                        roomId: "1234",
-//                        author: "Yifan Qin",
-//                        event: "Lady M",
-//                        totalAmount: 9.0,
-//                        involvedPeople: ["Yifan Qin", "Yi Wang", "Yuling Guan"],
-//                        averageAmount: 3.0,
-//                        time: Date.UTC(2018, 1, 2), // Notice that 1 here represents February
-//                        comment: "Very nice!"
-//                    },
-//                    projectionDoc:{
-//                        roomId:1,
-//                        event:1
-//                    }
-//                };
 
                 let wrappedAddRecordsTemplate = {
                     document: this.wrapRecordsTemplate(this.addRecordsTemplate)
@@ -335,14 +314,28 @@
                 }).catch(err => console.log(err));
 
 
+            },
+            handleEdit(index, row) {
+                console.log(index, row);
+            },
+            handleDelete(index, row) {
+                console.log(index, row);
+            },
+            confirmAuthor(){
+                this.author = this.tmpAuthor;
+                this.$message.info("You are chosen as " + this.author + ". Welcome ! ");
+                //TODO change UI, delete input
+                this.refreshRecords();
             }
 
-
-            //TODO(if confirmed, the records will be sent to backend and template will be refreshed.
-
         },
-        mounted: function(){
-            this.refreshRecords();
+        mounted: function () {
+            console.log(this.$route.params);
+            console.log(this.$route.query);
+            this.roomId = this.$route.params['roomId'];
+            this.people = this.$route.params['people'];
+            this.roomCreateTime = this.$route.params['roomCreateTime'];
+
         },
         filters: {
             formatDate (timeString){
