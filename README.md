@@ -45,3 +45,8 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
     + `Vue.prototype.$http = axios`
     + `axios.defaults.baseURL = 'http://localhost:3000'`
     + Type the statements above in **main.js**
+- How to redirect in Vue.js?
+    + [Tutorial](https://www.cnblogs.com/eva3288/p/8204713.html)
+    + `query`&`path` vs `params` vs `name`
+    + `query` is similar to HTTP GET, `params' is similar to HTTP POST
+    + the redirected page can use `this.$route.params` or `this.$route.query` to get the values.
