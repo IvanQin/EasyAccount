@@ -50,3 +50,10 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
     + `query`&`path` vs `params` vs `name`
     + `query` is similar to HTTP GET, `params' is similar to HTTP POST
     + the redirected page can use `this.$route.params` or `this.$route.query` to get the values.
+   
+### Knowledge
+- Difference between *sessionStorage* and *localStorage*
+    + [SessionStorage vs LocalStorage](https://stackoverflow.com/questions/5523140/html5-local-storage-vs-session-storage)
+- Difference between *storage* and *cookie*
+    + [storage vs cookie](https://stackoverflow.com/questions/3220660/local-storage-vs-cookies)
+    + Notice: cookie will be sent to server in every HTTP request but storage not.

@@ -110,7 +110,8 @@
                                     <el-button
                                             size="mini"
                                             type="danger"
-                                            @click="handleDelete(props.$index, props.row)" style="margin: 2px 2px">Delete
+                                            @click="handleDelete(props.$index, props.row)" style="margin: 2px 2px">
+                                        Delete
                                     </el-button>
                                 </template>
                             </el-table-column>
@@ -331,10 +332,22 @@
         },
         mounted: function () {
             console.log(this.$route.params);
-            console.log(this.$route.query);
-            this.roomId = this.$route.params['roomId'];
-            this.people = this.$route.params['people'];
-            this.roomCreateTime = this.$route.params['roomCreateTime'];
+            //console.log(this.$route.query);
+            if (utils.isEmpty(this.$route.params)) {
+                console.log('is empty');
+                this.roomId = sessionStorage.getItem('roomId');
+                this.people = JSON.parse(sessionStorage.getItem('people'));
+                this.roomCreateTime = sessionStorage.getItem('roomCreateTime');
+            }
+            else {
+                console.log('not empty');
+                this.roomId = this.$route.params['roomId'];
+                this.people = this.$route.params['people'];
+                this.roomCreateTime = this.$route.params['roomCreateTime'];
+                sessionStorage.setItem('roomId', this.roomId);
+                sessionStorage.setItem('people', JSON.stringify(this.people));
+                sessionStorage.setItem('roomCreateTime', this.roomCreateTime);
+            }
 
         },
         filters: {
