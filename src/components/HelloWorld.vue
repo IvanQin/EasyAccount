@@ -174,6 +174,53 @@
                         </div>
                     </el-dialog>
 
+                    <el-dialog title="Edit records" :visible.sync="showEditRecordsDialog">
+                        <el-form :model="editRecordsTemplate" :rules="addRecordsTemplateRules">
+                            <el-form-item label="Event" label-width="120px" prop="event">
+                                <el-input v-model="editRecordsTemplate.event" auto-complete="off"
+                                          placeholder="Brief description of event"></el-input>
+                            </el-form-item>
+                            <el-form-item label="Total amount" label-width="120px" prop="totalAmount">
+                                <el-input
+                                        placeholder="Total amount of money spent"
+                                        suffix-icon="el-icon-info"
+                                        v-model.number="editRecordsTemplate.totalAmount">
+                                </el-input>
+                            </el-form-item>
+
+                            <el-form-item label="People" label-width="120px" prop="people">
+
+                                <el-select v-model="editRecordsTemplate.involvedPeople" multiple
+                                           placeholder="Please choose">
+                                    <el-option v-for="p in people" :label="p" :key="p" :value="p"></el-option>
+
+                                </el-select>
+                            </el-form-item>
+
+                            </el-form-item-->
+                            <el-form-item label="Date" label-width="120px" prop="date">
+                                <el-date-picker
+                                        v-model="editRecordsTemplate.time"
+                                        type="date"
+                                        placeholder="choose date">
+                                </el-date-picker>
+                            </el-form-item>
+                            <el-form-item label="Comment" label-width="120px" prop="comment">
+                                <el-input
+                                        type="textarea"
+                                        :rows="2"
+                                        placeholder="Enter the comments"
+                                        v-model="editRecordsTemplate.comment">
+                                </el-input>
+                            </el-form-item>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="cancelEditRecords()">Cancel</el-button>
+                            <el-button type="primary" @click="submitEditRecords()">Confirm</el-button>
+                        </div>
+                    </el-dialog>
+
+
                 </el-main>
             </el-container>
         </el-container>
@@ -183,7 +230,7 @@
 
 <script>
     const utils = require('../utils/utils');
-
+    const SUCCESS_MSG = 'Success!';
     export default {
         name: 'HelloWorld',
         data () {
@@ -196,12 +243,21 @@
                 active: 0,
                 records: [],
                 showAddRecordsDialog: false,
+                showEditRecordsDialog: false,
                 addRecordsTemplate: {
                     involvedPeople: [],
                     time: '',
                     totalAmount: '',
                     event: '',
                     comment: ''
+                },
+                editRecordsTemplate: {
+                    involvedPeople: [],
+                    time: '',
+                    totalAmount: '',
+                    event: '',
+                    comment: '',
+                    dbId: ''
                 },
                 people: [],
                 addRecordsTemplateRules: {
@@ -248,10 +304,10 @@
                 this.$http.post('/db', submitAddRecordsRequest).then(res => {
                     let receiveData = res.data;
 
-                    if (receiveData == 'Success!') {
+                    if (receiveData == SUCCESS_MSG) {
                         this.$message({
                             type: 'success', // info,success,warning,error
-                            message: "Success!"
+                            message: "Success adding the record!"
                         });
                     }
                     this.refreshRecords();
@@ -265,14 +321,43 @@
                 });
                 this.showAddRecordsDialog = false;
             },
+            submitEditRecords(){
+                let wrappedEditRecordsTemplate = {
+                    updateDoc: this.editRecordsTemplate,
+                    document: {id: this.editRecordsTemplate.dbId}
+                };
+                let submitEditRecordsRequest = utils.getDbOperationTemplate(6, 'record', wrappedEditRecordsTemplate); // update by id
+                this.$http.post('/db', submitEditRecordsRequest).then(res => {
+                    let receiveData = res.data;
+
+                    if (receiveData == SUCCESS_MSG) {
+                        this.$message({
+                            type: 'success', // info,success,warning,error
+                            message: "Success editing the record!"
+                        });
+                    }
+                    this.refreshRecords();
+                    this.editRecordsTemplate = {};
+                }).catch(err => {
+                    console.log(err);
+                    this.$message({
+                        type: 'error', // info,success,warning,error
+                        message: err
+                    });
+                });
+                this.showEditRecordsDialog = false;
+
+            },
             cancelAddRecords(){
                 this.showAddRecordsDialog = false;
                 this.addRecordsTemplate = {};
-                this.$message({
-                    type: 'warning', // info,success,warning,error
-                    message: 'Cancelled.'
-                });
+                this.showCancelMessage()
 
+            },
+            cancelEditRecords(){
+                this.showEditRecordsDialog = false;
+                this.editRecordsTemplate = {};
+                this.showCancelMessage()
             },
             wrapRecordsTemplate(recordsTemplate){
                 recordsTemplate['roomId'] = this.roomId;
@@ -288,11 +373,12 @@
                         involvedPeople: 1,
                         averageAmount: 1,
                         time: 1,
-                        comment: 1
+                        comment: 1,
+                        id: 1
                     }
 
                 };
-                let fetchRecordsRequest = utils.getDbOperationTemplate(2, 'record', wrappedFetchRecordsTemplate)
+                let fetchRecordsRequest = utils.getDbOperationTemplate(2, 'record', wrappedFetchRecordsTemplate);
                 this.$http.post('/db', fetchRecordsRequest).then(res => {
                     let receivedData = res.data;
                     this.records = [];
@@ -306,41 +392,85 @@
                                 people: data.involvedPeople,
                                 avgAmount: data.totalAmount / data.involvedPeople.length,
                                 time: data.time,
-                                comment: data.comment
+                                comment: data.comment,
+                                dbId: data._id
                             };
                             this.records.push(tmpRecord);
                         }
                     }
 
-                }).catch(err => console.log(err));
+                }).catch(err => {
+                    console.log(err);
+                });
 
 
             },
             handleEdit(index, row) {
-                console.log(index, row);
+//                involvedPeople: [],
+//                    time: '',
+//                    totalAmount: '',
+//                    event: '',
+//                    comment: ''
+                this.editRecordsTemplate.involvedPeople = row.people;
+                this.editRecordsTemplate.time = row.time;
+                this.editRecordsTemplate.event = row.event;
+                this.editRecordsTemplate.comment = row.comment;
+                this.editRecordsTemplate.totalAmount = row.totalAmount;
+                this.editRecordsTemplate.dbId = row.dbId;
+                this.showEditRecordsDialog = true;
             },
             handleDelete(index, row) {
-                console.log(index, row);
+                this.$confirm('Are you sure to delete this record?', 'Warning', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    console.log(row.dbId);
+                    let deleteRecordsRequest = utils.getDbOperationTemplate(5, 'record', {
+                        document: {id: row.dbId}
+                    });
+                    console.log(deleteRecordsRequest);
+                    this.$http.post('/db', deleteRecordsRequest).then(res => {
+                        if (res.data == SUCCESS_MSG) {
+                            this.refreshRecords();
+                            this.$message({
+                                type: 'success', // info,success,warning,error
+                                message: 'The record has been deleted.'
+                            });
+                        } else {
+                            this.$message({
+                                type: 'error', // info,success,warning,error
+                                message: 'Cannot find the record.'
+                            });
+                        }
+                    }).catch(err => console.log(err));
+
+                }).catch(() => {
+                    this.showCancelMessage()
+                });
             },
             confirmAuthor(){
                 this.author = this.tmpAuthor;
                 this.$message.info("You are chosen as " + this.author + ". Welcome ! ");
                 //TODO change UI, delete input
                 this.refreshRecords();
+            },
+            showCancelMessage(){
+                this.$message({
+                    type: 'warning', // info,success,warning,error
+                    message: 'Cancelled.'
+                });
             }
 
         },
         mounted: function () {
-            console.log(this.$route.params);
             //console.log(this.$route.query);
             if (utils.isEmpty(this.$route.params)) {
-                console.log('is empty');
                 this.roomId = sessionStorage.getItem('roomId');
                 this.people = JSON.parse(sessionStorage.getItem('people'));
                 this.roomCreateTime = sessionStorage.getItem('roomCreateTime');
             }
             else {
-                console.log('not empty');
                 this.roomId = this.$route.params['roomId'];
                 this.people = this.$route.params['people'];
                 this.roomCreateTime = this.$route.params['roomCreateTime'];
