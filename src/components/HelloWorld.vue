@@ -300,7 +300,7 @@
                 let wrappedAddRecordsTemplate = {
                     document: this.wrapRecordsTemplate(this.addRecordsTemplate)
                 };
-                let submitAddRecordsRequest = utils.getDbOperationTemplate(0, 'record', wrappedAddRecordsTemplate);
+                let submitAddRecordsRequest = utils.getDbOperationTemplate(utils.INSERT, 'record', wrappedAddRecordsTemplate);
                 this.$http.post('/db', submitAddRecordsRequest).then(res => {
                     let receiveData = res.data;
 
@@ -326,7 +326,7 @@
                     updateDoc: this.editRecordsTemplate,
                     document: {id: this.editRecordsTemplate.dbId}
                 };
-                let submitEditRecordsRequest = utils.getDbOperationTemplate(6, 'record', wrappedEditRecordsTemplate); // update by id
+                let submitEditRecordsRequest = utils.getDbOperationTemplate(utils.UPDATE_BY_ID, 'record', wrappedEditRecordsTemplate); // update by id
                 this.$http.post('/db', submitEditRecordsRequest).then(res => {
                     let receiveData = res.data;
 
@@ -378,7 +378,7 @@
                     }
 
                 };
-                let fetchRecordsRequest = utils.getDbOperationTemplate(2, 'record', wrappedFetchRecordsTemplate);
+                let fetchRecordsRequest = utils.getDbOperationTemplate(utils.SEARCH, 'record', wrappedFetchRecordsTemplate);
                 this.$http.post('/db', fetchRecordsRequest).then(res => {
                     let receivedData = res.data;
                     this.records = [];
@@ -426,7 +426,7 @@
                     type: 'warning'
                 }).then(() => {
                     console.log(row.dbId);
-                    let deleteRecordsRequest = utils.getDbOperationTemplate(5, 'record', {
+                    let deleteRecordsRequest = utils.getDbOperationTemplate(utils.DELETE_BY_ID, 'record', {
                         document: {id: row.dbId}
                     });
                     console.log(deleteRecordsRequest);

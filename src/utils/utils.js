@@ -29,3 +29,13 @@ export function isEmpty(obj) {
     }
     return true;
 }
+
+export const INSERT = 0;
+export const UPDATE = 1;
+export const SEARCH = 2;
+export const DELETE = 3;
+export const SEARCH_BY_ID = 4;
+export const DELETE_BY_ID = 5;
+export const UPDATE_BY_ID = 6;
+export const UPDATE_MANY = 7;
+export const GROUP_BY = 8;
