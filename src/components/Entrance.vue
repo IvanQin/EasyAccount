@@ -5,25 +5,27 @@
 
             </el-header>
             <el-main>
+
                 <div class="center">
+                    <el-card class="box-card">
+                        <el-row :gutter="20">
+                            <el-col :span="8">
+                                <el-input v-model="roomId" placeholder="Please enter room id.">
 
-                    <el-row :gutter="20">
-                        <el-col :span="8">
-                            <el-input v-model="roomId" placeholder="Please enter room id.">
+                                </el-input>
+                            </el-col>
+                            <el-col :span="8">
+                                <el-input type="password" v-model="password" placeholder="Please enter password.">
+                                </el-input>
+                            </el-col>
+                            <el-col :span="8">
+                                <el-button type="success" @click="submitRoomId()">Confirm</el-button>
+                            </el-col>
+                        </el-row>
 
-                            </el-input>
-                        </el-col>
-                        <el-col :span="8">
-                            <el-input type="password" v-model="password" placeholder="Please enter password.">
-                            </el-input>
-                        </el-col>
-                        <el-col :span="8">
-                            <el-button type="success" @click="submitRoomId()">Confirm</el-button>
-                        </el-col>
-                    </el-row>
-
-
+                    </el-card>
                 </div>
+
 
             </el-main>
         </el-container>
@@ -67,7 +69,7 @@
                         // TODO redirect, add access control!
                         // TODO Set cookie manually!
                         //this.$cookies.set('roomId',this.roomId);
-                        this.$http.post('/api/get-token',{'roomId':this.roomId}).then(res=>{
+                        this.$http.post('/api/get-token', {'roomId': this.roomId}).then(res => {
                             console.log(res);
                             this.$router.push({
                                 name: 'HelloWorld',
