@@ -118,6 +118,76 @@
                         </el-table>
 
                     </el-row>
+                    <el-row>
+                        <el-table
+                                :data="totalRecords"
+                                style="width: 100%">
+                            <el-table-column type="expand">
+
+                                <el-form label-position="left" inline class="demo-table-expand" slot-scope="props">
+                                    <el-form-item label="ID">
+                                        <span>{{ props.row.id }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="Author">
+                                        <span>{{ props.row.author }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="Event">
+                                        <span>{{ props.row.event }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="Total Amount">
+                                        <span>{{ props.row.totalAmount }}</span>
+                                    </el-form-item>
+                                    <!--el-form-item label="People">
+                                        <span>{{ props.row.people }}</span>
+                                    </el-form-item-->
+                                    <el-form-item label="People">
+                                        <span>
+                                            <el-tag v-for="p in props.row.people" :key="p.id" style="margin: 0 2px">{{p}}</el-tag>
+                                        </span>
+                                    </el-form-item>
+                                    <el-form-item label="Avg Amount">
+                                        <span>{{ props.row.avgAmount }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="Time">
+                                        <span>{{ props.row.time | formatDate }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="Comment">
+                                        <span>{{ props.row.comment }}</span>
+                                    </el-form-item>
+                                </el-form>
+
+                            </el-table-column>
+                            <el-table-column
+                                    prop="id"
+                                    label="ID"
+                                    width="180">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="event"
+                                    label="Event"
+                                    width="180">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="totalAmount"
+                                    label="Total Amount"
+                                    width="180"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="people"
+                                    label="People"
+                                    width="180"
+                            >
+                                <template slot-scope="props">
+                                    <span><el-tag v-for="p in props.row.people" :key="p.id" style="margin: 2px 2px">{{p}}</el-tag></span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="author" label="Author" width="180">
+
+                            </el-table-column>
+                        </el-table>
+
+                    </el-row>
                     <el-dialog title="Add records" :visible.sync="showAddRecordsDialog">
                         <el-form :model="addRecordsTemplate" :rules="addRecordsTemplateRules">
                             <el-form-item label="Event" label-width="120px" prop="event">
@@ -242,6 +312,7 @@
 
                 active: 0,
                 records: [],
+                totalRecords: [],
                 showAddRecordsDialog: false,
                 showEditRecordsDialog: false,
                 addRecordsTemplate: {
@@ -310,7 +381,7 @@
                             message: "Success adding the record!"
                         });
                     }
-                    this.refreshRecords();
+                    this.refreshMyRecords();
                     this.addRecordsTemplate = {};
                 }).catch(err => {
                     console.log(err);
@@ -336,7 +407,7 @@
                             message: "Success editing the record!"
                         });
                     }
-                    this.refreshRecords();
+                    this.refreshMyRecords();
                     this.editRecordsTemplate = {};
                 }).catch(err => {
                     console.log(err);
@@ -364,9 +435,66 @@
                 recordsTemplate['author'] = this.author;
                 return recordsTemplate;
             },
+            wrapRoomRecordsTemplate(recordsTemplate){
+                recordsTemplate['roomId'] = this.roomId;
+                return recordsTemplate;
+            },
+
+            refreshMyRecords(){
+                this.refreshRecords().then(resolve => {
+                    // receivedData = [{},{},...{}]
+                    let receivedData = resolve;
+                    console.log(receivedData);
+                    this.records = [];
+                    for (let i in receivedData) {
+                        if (receivedData.hasOwnProperty(i)) {
+                            let data = receivedData[i];
+                            if (data.author != this.author) continue; // filtered
+                            this.records.push(data);
+                        }
+                    }
+                    this.refreshTotalRecords(false, receivedData); // refresh local records will emit refreshing all records
+                }, reject => {
+                    console.log(reject);
+                });
+            },
+            /**
+             * Refresh all of the records (added by all people)
+             * @param isPositive if the function is called by {@link refreshMyRecords}
+             * @param receivedData [{},{},...{}] where {} is the record
+             */
+            refreshTotalRecords(isPositive, receivedData){
+                this.totalRecords = [];
+
+                if (isPositive) {
+                    this.refreshRecords().then(resolve => {
+                        let receivedData = resolve;
+                        for (let i in receivedData) {
+                            if (receivedData.hasOwnProperty(i)) {
+                                let data = receivedData[i];
+                                this.totalRecords.push(data);
+                            }
+                        }
+                    }, reject => {
+                        console.log(reject);
+                    });
+
+                } else {
+                    for (let i in receivedData) {
+                        if (receivedData.hasOwnProperty(i)) {
+                            let data = receivedData[i];
+                            this.totalRecords.push(data);
+                        }
+                    }
+                }
+            },
+            /**
+             * Send HTTP POST to db and get all the records.
+             * @returns {Promise}
+             */
             refreshRecords(){
                 let wrappedFetchRecordsTemplate = {
-                    document: this.wrapRecordsTemplate({}),
+                    document: this.wrapRoomRecordsTemplate({}),
                     projectionDoc: {
                         event: 1,
                         totalAmount: 1,
@@ -374,43 +502,40 @@
                         averageAmount: 1,
                         time: 1,
                         comment: 1,
-                        id: 1
+                        id: 1,
+                        author: 1
                     }
-
                 };
                 let fetchRecordsRequest = utils.getDbOperationTemplate(utils.SEARCH, 'record', wrappedFetchRecordsTemplate);
-                this.$http.post('/db', fetchRecordsRequest).then(res => {
-                    let receivedData = res.data;
-                    this.records = [];
-                    for (let i in receivedData) {
-                        if (receivedData.hasOwnProperty(i)) {
-                            let data = receivedData[i];
-                            let tmpRecord = {
-                                id: i,
-                                event: data.event,
-                                totalAmount: data.totalAmount,
-                                people: data.involvedPeople,
-                                avgAmount: data.totalAmount / data.involvedPeople.length,
-                                time: data.time,
-                                comment: data.comment,
-                                dbId: data._id
-                            };
-                            this.records.push(tmpRecord);
+                return new Promise((resolve, reject) => {
+                    this.$http.post('/db', fetchRecordsRequest).then(res => {
+                        let receivedData = res.data;
+                        let allRecord = [];
+                        for (let i in receivedData) {
+                            if (receivedData.hasOwnProperty(i)) {
+                                let data = receivedData[i];
+                                let tmpRecord = {
+                                    id: i,
+                                    event: data.event,
+                                    totalAmount: data.totalAmount,
+                                    people: data.involvedPeople,
+                                    avgAmount: data.totalAmount / data.involvedPeople.length,
+                                    time: data.time,
+                                    comment: data.comment,
+                                    dbId: data._id,
+                                    author: data.author
+                                };
+                                allRecord.push(tmpRecord);
+                            }
                         }
-                    }
-
-                }).catch(err => {
-                    console.log(err);
+                        resolve(allRecord);
+                    }).catch(err => {
+                        console.log(err);
+                        reject(err);
+                    });
                 });
-
-
             },
             handleEdit(index, row) {
-//                involvedPeople: [],
-//                    time: '',
-//                    totalAmount: '',
-//                    event: '',
-//                    comment: ''
                 this.editRecordsTemplate.involvedPeople = row.people;
                 this.editRecordsTemplate.time = row.time;
                 this.editRecordsTemplate.event = row.event;
@@ -432,7 +557,7 @@
                     console.log(deleteRecordsRequest);
                     this.$http.post('/db', deleteRecordsRequest).then(res => {
                         if (res.data == SUCCESS_MSG) {
-                            this.refreshRecords();
+                            this.refreshMyRecords();
                             this.$message({
                                 type: 'success', // info,success,warning,error
                                 message: 'The record has been deleted.'
@@ -453,7 +578,7 @@
                 this.author = this.tmpAuthor;
                 this.$message.info("You are chosen as " + this.author + ". Welcome ! ");
                 //TODO change UI, delete input
-                this.refreshRecords();
+                this.refreshMyRecords();
             },
             showCancelMessage(){
                 this.$message({
