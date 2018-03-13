@@ -39,7 +39,7 @@
                         <el-row>
                             <el-col :span="8">
                                 <el-button type="primary" icon="el-icon-circle-plus"
-                                           @click="showAddRecordsDialog = true">
+                                           @click="beforeShowAddRecordsDialog()" :disabled="authorNotConfirmed">
                                     Add record
                                 </el-button>
                             </el-col>
@@ -149,7 +149,6 @@
                                         </el-form-item-->
                                         <el-form-item label="People">
                                         <span>
-                                            <el-tag v-for="p in props.row.people" :key="p.id" style="margin: 0 2px">{{p}}</el-tag>
                                         </span>
                                         </el-form-item>
                                         <el-form-item label="Avg Amount">
@@ -195,6 +194,27 @@
                             </el-table>
 
                         </el-row>
+                    </el-card>
+                    <el-card class="box-card">
+                        <el-collapse accordion>
+                            <el-collapse-item v-for="info in accountInfo" :key="info.id">
+                                <template slot="title">
+                                    <div v-if="info.giveMoney">
+                                        Give
+                                        <el-tag>{{formMoney(info.amount)}}</el-tag>
+                                        to
+                                        <el-tag>{{info.name}}</el-tag>
+                                    </div>
+                                    <div v-else>
+                                        Request
+                                        <el-tag>{{formMoney(info.amount)}}</el-tag>
+                                        from
+                                        <el-tag>{{info.name}}</el-tag>
+                                    </div>
+                                </template>
+
+                            </el-collapse-item>
+                        </el-collapse>
                     </el-card>
                     <el-dialog title="Add records" :visible.sync="showAddRecordsDialog">
                         <el-form :model="addRecordsTemplate" :rules="addRecordsTemplateRules">
@@ -297,8 +317,6 @@
                             <el-button type="primary" @click="submitEditRecords()">Confirm</el-button>
                         </div>
                     </el-dialog>
-
-
                 </el-main>
             </el-container>
         </el-container>
@@ -308,7 +326,12 @@
 
 <script>
     const utils = require('../utils/utils');
+    const account = require('../utils/account');
     const SUCCESS_MSG = 'Success!';
+    const currencyUnitToSign = {
+        USD:'$',
+        CNY:'¥'
+    };
     export default {
         name: 'HelloWorld',
         data () {
@@ -317,7 +340,7 @@
                 roomCreateTime: '',
                 author: '',
                 tmpAuthor: '',
-
+                currencyUnit: 'USD', // need changed
                 active: 0,
                 records: [],
                 totalRecords: [],
@@ -356,8 +379,6 @@
                         // actually the trigger should be 'change', but I cannot fix the bug that even if I have selected
                         // people, it shows the error message as well.
                     ],
-
-
                 },
                 rules: {},
                 ruleForm: {
@@ -370,6 +391,8 @@
                     resource: '',
                     desc: ''
                 },
+                matrix: [[]],
+                authorNotConfirmed: true
 
             }
         },
@@ -495,6 +518,10 @@
                         }
                     }
                 }
+                // re-calculate account matrix
+                let solver = new account.accountSolver(this.totalRecords, this.people, this.peopleToId);
+                this.matrix = solver.runSolver();
+
             },
             /**
              * Send HTTP POST to db and get all the records.
@@ -584,6 +611,7 @@
             },
             confirmAuthor(){
                 this.author = this.tmpAuthor;
+                this.authorNotConfirmed = false; // enabled the add record button
                 this.$message.info("You are chosen as " + this.author + ". Welcome ! ");
                 //TODO change UI, delete input
                 this.refreshMyRecords();
@@ -593,7 +621,23 @@
                     type: 'warning', // info,success,warning,error
                     message: 'Cancelled.'
                 });
+            },
+            beforeShowAddRecordsDialog(){
+                if (this.author == ''){
+                    this.$message.warning("Please ")
+
+                }
+                else {
+                    this.showAddRecordsDialog = true;
+                }
+            },
+            formMoney(number){
+                return currencyUnitToSign[this.currencyUnit] + number;
             }
+
+        },
+        created: function(){
+            this.currencyUnit = 'USD';
 
         },
         mounted: function () {
@@ -613,10 +657,12 @@
             }
         },
         filters: {
+            /* the filters cannot rely on the staffs in data*/
             formatDate (timeString){
                 let d = new Date(Date.parse(timeString));
                 return d.toLocaleDateString();
-            }
+            },
+
         },
         computed: {
             // can be reached using 'this.peopleToId'
@@ -628,6 +674,23 @@
                     }
                 }
                 return tmpMap;
+            },
+            accountInfo: function () {
+                let tmpList = [];
+                let yourId = this.peopleToId[this.author];
+                for (let i in this.matrix[yourId]) {
+                    if (this.matrix[yourId].hasOwnProperty(i)) {
+                        if (i != yourId) { // do not give yourself money
+                            let signedAmount = this.matrix[yourId][i];
+                            tmpList.push({
+                                name: this.people[i],
+                                amount: signedAmount > 0 ? signedAmount : -signedAmount,
+                                giveMoney: signedAmount > 0
+                            })
+                        }
+                    }
+                }
+                return tmpList;
             }
         }
 
@@ -673,7 +736,7 @@
         text-align: left;
     }
 
-    .box-card{
+    .box-card {
         margin: 20px 0;
     }
 </style>
