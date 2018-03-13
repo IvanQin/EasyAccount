@@ -2,7 +2,7 @@
  * Created by Qinyifan on 18/3/11.
  */
 
-export function accoutSolver(records, people, peopleToId) {
+export function accountSolver(records, people, peopleToId) {
     this.records = records;
     this.people = people; // all of the people
     this.numberOfPeople = people.length;
@@ -21,7 +21,7 @@ export function accoutSolver(records, people, peopleToId) {
         for (let i in this.records) {
             if (this.records.hasOwnProperty(i)) {
                 let record = this.records[i];
-                let involvedPeople = record.involvedPeople;
+                let involvedPeople = record.people;
                 let avgAmount = record.avgAmount;
                 let payerId = this.peopleToId[record.author];
                 for (let k in involvedPeople) {
