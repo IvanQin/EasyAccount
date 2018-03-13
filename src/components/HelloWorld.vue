@@ -3,7 +3,7 @@
         <el-container>
             <el-header>Header</el-header>
             <el-container>
-                <el-aside>
+                <!--el-aside>
                     <div style="height: 600px;margin: auto;padding: 10px 50px">
                         <el-steps direction="vertical" :active="1">
                             <el-step title="步骤 1"></el-step>
@@ -11,7 +11,7 @@
                             <el-step title="步骤 3" description="这是一段很长很长很长的描述性文字"></el-step>
                         </el-steps>
                     </div>
-                </el-aside>
+                </el-aside-->
                 <el-main>
                     <el-card class="box-card">
                         <el-row>
@@ -60,12 +60,11 @@
                                         <el-form-item label="Total Amount">
                                             <span>{{ props.row.totalAmount }}</span>
                                         </el-form-item>
-                                        <!--el-form-item label="People">
-                                            <span>{{ props.row.people }}</span>
-                                        </el-form-item-->
                                         <el-form-item label="People">
                                         <span>
-                                            <el-tag v-for="p in props.row.people" :key="p.id" style="margin: 0 2px">{{p}}</el-tag>
+                                            <el-tag v-for="p in props.row.people" :key="p.id"
+                                                    :style="tagColor(p,false)"
+                                                    :color="tagColor(p,true)">{{p}}</el-tag>
                                         </span>
                                         </el-form-item>
                                         <el-form-item label="Avg Amount">
@@ -102,13 +101,16 @@
                                         width="180"
                                 >
                                     <template slot-scope="props">
-                                        <span><el-tag v-for="p in props.row.people" :key="p.id" style="margin: 2px 2px">{{p}}</el-tag></span>
+                                        <span><el-tag v-for="p in props.row.people" :key="p.id"
+                                                      :style="tagColor(p,false)"
+                                                      :color="tagColor(p,true)">{{p}}</el-tag></span>
                                     </template>
                                 </el-table-column>
                                 <el-table-column label="Operation">
                                     <template slot-scope="props">
                                         <el-button
                                                 size="mini"
+                                                type="info"
                                                 @click="handleEdit(props.$index, props.row)" style="margin: 2px 2px">
                                             Edit
                                         </el-button>
@@ -149,6 +151,8 @@
                                         </el-form-item-->
                                         <el-form-item label="People">
                                         <span>
+                                            <el-tag v-for="p in props.row.people" :key="p.id" :style="tagColor(p,false)"
+                                                    :color="tagColor(p,true)">{{p}}</el-tag>
                                         </span>
                                         </el-form-item>
                                         <el-form-item label="Avg Amount">
@@ -179,13 +183,16 @@
                                         width="180"
                                 >
                                 </el-table-column>
+                                </el-table-column>
                                 <el-table-column
                                         prop="people"
                                         label="People"
                                         width="180"
                                 >
                                     <template slot-scope="props">
-                                        <span><el-tag v-for="p in props.row.people" :key="p.id" style="margin: 2px 2px">{{p}}</el-tag></span>
+                                        <span><el-tag v-for="p in props.row.people" :key="p.id"
+                                                      :style="tagColor(p,false)"
+                                                      :color="tagColor(p,true)">{{p}}</el-tag></span>
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="author" label="Author" width="180">
@@ -329,9 +336,19 @@
     const account = require('../utils/account');
     const SUCCESS_MSG = 'Success!';
     const currencyUnitToSign = {
-        USD:'$',
-        CNY:'¥'
+        USD: '$',
+        CNY: '¥'
     };
+    const peopleIdToColor = [
+        {bg: '#FFFFFF', font: '#545454'},
+        {bg: '#fae6d1', font: '#E88C67'},
+        {bg: '#d1f3fa', font: '#30c9e8'},
+        {bg: '#d1e3fa', font: '#4286F3'},
+        {bg: '#fad3d1', font: '#EB4537'},
+        {bg: '#faf9d1', font: '#FAC230'},
+        {bg: '#d1fad7', font: '#55AF7B'},
+        {bg: '#e5d1fa', font: '#8930e8'}
+        ];
     export default {
         name: 'HelloWorld',
         data () {
@@ -340,7 +357,7 @@
                 roomCreateTime: '',
                 author: '',
                 tmpAuthor: '',
-                currencyUnit: 'USD', // need changed
+                currencyUnit: '', // need changed
                 active: 0,
                 records: [],
                 totalRecords: [],
@@ -552,7 +569,7 @@
                                 let tmpRecord = {
                                     id: i,
                                     event: data.event,
-                                    totalAmount: data.totalAmount,
+                                    totalAmount: this.formMoney(data.totalAmount),
                                     people: data.involvedPeople,
                                     avgAmount: data.totalAmount / data.involvedPeople.length,
                                     time: data.time,
@@ -623,7 +640,7 @@
                 });
             },
             beforeShowAddRecordsDialog(){
-                if (this.author == ''){
+                if (this.author == '') {
                     this.$message.warning("Please ")
 
                 }
@@ -633,32 +650,43 @@
             },
             formMoney(number){
                 return currencyUnitToSign[this.currencyUnit] + number;
+            },
+            tagColor(people, isBackground){
+                let idx = this.peopleToId[people]%1;
+                if (isBackground)
+                    return peopleIdToColor[idx].bg;
+                let styleStr = 'color:' + peopleIdToColor[idx].font + ';border:1px solid ' +
+                    utils.colorToRGBA(peopleIdToColor[idx].font,0.1);
+                return styleStr;
             }
-
         },
-        created: function(){
-            this.currencyUnit = 'USD';
-
-        },
+//        created: function(){
+//            this.currencyUnit = 'USD';
+//
+//        },
         mounted: function () {
             //console.log(this.$route.query);
             if (utils.isEmpty(this.$route.params)) {
                 this.roomId = sessionStorage.getItem('roomId');
                 this.people = JSON.parse(sessionStorage.getItem('people'));
                 this.roomCreateTime = sessionStorage.getItem('roomCreateTime');
+                this.currencyUnit = sessionStorage.getItem('currencyUnit');
             }
             else {
                 this.roomId = this.$route.params['roomId'];
                 this.people = this.$route.params['people'];
                 this.roomCreateTime = this.$route.params['roomCreateTime'];
+                this.currencyUnit = this.$route.params['currencyUnit'];
                 sessionStorage.setItem('roomId', this.roomId);
                 sessionStorage.setItem('people', JSON.stringify(this.people));
                 sessionStorage.setItem('roomCreateTime', this.roomCreateTime);
+                sessionStorage.setItem('currencyUnit', this.currencyUnit);
             }
         },
         filters: {
             /* the filters cannot rely on the staffs in data*/
             formatDate (timeString){
+                if (timeString == '' || timeString == null) return '';
                 let d = new Date(Date.parse(timeString));
                 return d.toLocaleDateString();
             },
@@ -738,5 +766,9 @@
 
     .box-card {
         margin: 20px 0;
+    }
+
+    .el-tag {
+        margin: 2px 2px;
     }
 </style>
