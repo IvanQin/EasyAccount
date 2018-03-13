@@ -30,6 +30,22 @@ export function isEmpty(obj) {
     return true;
 }
 
+function hexToDec(str) {
+    str = str.toLowerCase();
+    let res = 0;
+    for (let i = 0; i < str.length; i++) {
+        res = res * 16 + str.charCodeAt(i) - 87;
+    }
+    return res;
+}
+
+export function colorToRGBA(color, alpha) {
+    color = color.substring(1);
+    let r = hexToDec(color.substring(0, 2));
+    let g = hexToDec(color.substring(2, 4));
+    let b = hexToDec(color.substring(4, 6));
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
 export const INSERT = 0;
 export const UPDATE = 1;
 export const SEARCH = 2;
