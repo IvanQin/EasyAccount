@@ -57,3 +57,9 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 - Difference between *storage* and *cookie*
     + [storage vs cookie](https://stackoverflow.com/questions/3220660/local-storage-vs-cookies)
     + Notice: cookie will be sent to server in every HTTP request but storage not.
+- Instance in javascript
+    + [JS instance and class](http://blog.csdn.net/alex8046/article/details/51940518)
+
+### TODO
+-[x] Core computing strategy
+-[ ] Data visualization (using graph to show the payment date)
