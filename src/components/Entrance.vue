@@ -44,7 +44,7 @@
         },
         methods: {
             submitRoomId(){
-                let checkRoomIdRequest = utils.getDbOperationTemplate(2, 'room', {
+                let checkRoomIdRequest = utils.getDbOperationTemplate(utils.SEARCH, 'room', {
                     document: {
                         id: this.roomId,
                         password: md5(this.password)
@@ -87,7 +87,8 @@
                 return {
                     'roomId': roomInfo.id,
                     'people': roomInfo.people,
-                    'roomCreateTime': roomInfo.createTime
+                    'roomCreateTime': roomInfo.createTime,
+                    'currencyUnit': roomInfo.currencyUnit
                 }
 
             }
