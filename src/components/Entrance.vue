@@ -66,11 +66,22 @@
                         console.log('Internal error! The roomId is not unique !')
                     }
                     else {
-                        // TODO redirect, add access control!
-                        // TODO Set cookie manually!
-                        //this.$cookies.set('roomId',this.roomId);
-                        this.$http.post('/api/get-token', {'roomId': this.roomId}).then(res => {
-                            console.log(res);
+                        let insertTokenToDB = utils.getDbOperationTemplate(utils.INSERT, 'auth', {
+                            document: {
+                                roomId: this.roomId
+                                // token will be added on the server side
+                            }
+                        });
+                        let getTokenRequest = {
+                            roomId: this.roomId,
+                            dbDocument: insertTokenToDB
+                        };
+
+                        this.$http.post('/api/get-token', getTokenRequest).then(res => {
+                            let receivedData = res.data;
+                            let accessToken = receivedData['accessToken'];
+                            this.$cookies.set('access-token', accessToken, {expires: 1});
+                            this.$cookies.set('roomId', this.roomId, {expires: 1});
                             this.$router.push({
                                 name: 'HelloWorld',
                                 params: this.wrapRoomInfo(data[0]),
