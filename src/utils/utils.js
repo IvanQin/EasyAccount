@@ -55,3 +55,5 @@ export const DELETE_BY_ID = 5;
 export const UPDATE_BY_ID = 6;
 export const UPDATE_MANY = 7;
 export const GROUP_BY = 8;
+
+export const SUCCESS_MSG = 'Success!';

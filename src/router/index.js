@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Entrance from '@/components/Entrance'
 import Forbidden from '@/components/Forbidden'
+import NotFound from '@/components/NotFound'
+
 Vue.use(Router);
 const utils = require('../utils/utils');
 const router = new Router({
@@ -16,7 +18,7 @@ const router = new Router({
                 console.log('from:', from);
                 let accessToken = Vue.prototype.$cookies.get('access-token');
                 let roomId = Vue.prototype.$cookies.get('roomId');
-                let validateTokenRequest = utils.getDbOperationTemplate('auth', utils.SEARCH, {
+                let validateTokenRequest = utils.getDbOperationTemplate(utils.SEARCH, 'auth', {
                     document: {
                         token: accessToken,
                         roomId: roomId
@@ -25,8 +27,7 @@ const router = new Router({
                 console.log(validateTokenRequest);
                 Vue.prototype.$http.post('/api/validate-token', {dbDocument: validateTokenRequest}).then(res => {
                     let receivedData = res.data;
-                    console.log(receivedData);
-                    if (receivedData == 'OK') {
+                    if (receivedData.status == utils.SUCCESS_MSG) {
                         next();
                     }
                     else {
@@ -50,6 +51,11 @@ const router = new Router({
             path: '/403',
             name: 'Forbidden',
             component: Forbidden
+        },
+        {
+            path: '/*',
+            name: 'NotFound',
+            component: NotFound
         }
     ]
 });
