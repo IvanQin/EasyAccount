@@ -15,7 +15,7 @@
                 <el-main>
                     <el-card class="box-card">
                         <el-row>
-                            <el-col :span="8">
+                            <el-col>
                                 Please specify your name:
                             </el-col>
                         </el-row>
@@ -82,23 +82,23 @@
                                 <el-table-column
                                         prop="id"
                                         label="ID"
-                                        width="180">
+                                        :width="tableColumnWidth.id">
                                 </el-table-column>
                                 <el-table-column
                                         prop="event"
                                         label="Event"
-                                        width="180">
+                                        :width="tableColumnWidth.event">
                                 </el-table-column>
                                 <el-table-column
                                         prop="totalAmount"
                                         label="Total Amount"
-                                        width="180"
+                                        :width="tableColumnWidth.totalAmount"
                                 >
                                 </el-table-column>
                                 <el-table-column
                                         prop="people"
                                         label="People"
-                                        width="180"
+                                        :width="tableColumnWidth.people"
                                 >
                                     <template slot-scope="props">
                                         <span><el-tag v-for="p in props.row.people" :key="p.id"
@@ -170,24 +170,24 @@
                                 <el-table-column
                                         prop="id"
                                         label="ID"
-                                        width="180">
+                                        :width="tableColumnWidth.id">
                                 </el-table-column>
                                 <el-table-column
                                         prop="event"
                                         label="Event"
-                                        width="180">
+                                        :width="tableColumnWidth.event">
                                 </el-table-column>
                                 <el-table-column
                                         prop="totalAmount"
                                         label="Total Amount"
-                                        width="180"
+                                        :width="tableColumnWidth.totalAmount"
                                 >
                                 </el-table-column>
                                 </el-table-column>
                                 <el-table-column
                                         prop="people"
                                         label="People"
-                                        width="180"
+                                        :width="tableColumnWidth.people"
                                 >
                                     <template slot-scope="props">
                                         <span><el-tag v-for="p in props.row.people" :key="p.id"
@@ -195,7 +195,7 @@
                                                       :color="tagColor(p,true)">{{p}}</el-tag></span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="author" label="Author" width="180">
+                                <el-table-column prop="author" label="Author" :width="tableColumnWidth.author">
 
                                 </el-table-column>
                             </el-table>
@@ -261,7 +261,9 @@
                                 <el-date-picker
                                         v-model="addRecordsTemplate.time"
                                         type="date"
-                                        placeholder="choose date">
+                                        placeholder="choose date"
+                                        style="overflow: auto"
+                                >
                                 </el-date-picker>
                             </el-form-item>
                             <el-form-item label="Comment" label-width="120px" prop="comment">
@@ -409,7 +411,14 @@
                     desc: ''
                 },
                 matrix: [[]],
-                authorNotConfirmed: true
+                authorNotConfirmed: true,
+                tableColumnWidth:{
+                    id:50,
+                    event:180,
+                    totalAmount:100,
+                    people:180,
+                    author:180,
+                }
 
             }
         },
@@ -770,5 +779,15 @@
 
     .el-tag {
         margin: 2px 2px;
+    }
+
+    @media (max-width: 768px) {
+        .el-dialog {
+            width: 90%;
+        }
+
+        .el-date-editor.el-input, .el-date-editor.el-input__inner{
+            width: auto;
+        }
     }
 </style>
