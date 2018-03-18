@@ -8,21 +8,23 @@
 
                 <div class="center">
                     <el-card class="box-card">
-                        <el-row :gutter="20">
-                            <el-col :span="8">
-                                <el-input v-model="roomId" placeholder="Please enter room id.">
+                        <el-form ref="enterRoomForm">
 
-                                </el-input>
-                            </el-col>
-                            <el-col :span="8">
-                                <el-input type="password" v-model="password" placeholder="Please enter password.">
-                                </el-input>
-                            </el-col>
-                            <el-col :span="8">
-                                <el-button type="success" @click="submitRoomId()">Confirm</el-button>
-                            </el-col>
-                        </el-row>
+                            <el-row :gutter="20">
+                                <el-col :span="8">
+                                    <el-input v-model="roomId" placeholder="Room id">
 
+                                    </el-input>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-input type="password" v-model="password" placeholder="Password">
+                                    </el-input>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-button type="success" @click="submitRoomId()">Confirm</el-button>
+                                </el-col>
+                            </el-row>
+                        </el-form>
                     </el-card>
                 </div>
 
@@ -59,6 +61,8 @@
                             type: 'error', // info,success,warning,error
                             message: "Cannot find room " + this.roomId + " or the password is wrong. Please re-check."
                         });
+                        //this.$ref['enterRoomForm'].resetFields(); // clear form
+                        this.password = '';
                         this.roomId = '';
 
                     }
