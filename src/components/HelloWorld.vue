@@ -282,8 +282,8 @@
                         </div>
                     </el-dialog>
 
-                    <el-dialog title="Edit records" :visible.sync="showEditRecordsDialog">
-                        <el-form :model="editRecordsTemplate" :rules="addRecordsTemplateRules">
+                    <el-dialog title="Edit records" :visible.sync="showEditRecordsDialog" :before-close="cancelEditRecords">
+                        <el-form :model="editRecordsTemplate" ref="editRecordsForm" :rules="addRecordsTemplateRules">
                             <el-form-item label="Event" label-width="120px" prop="event">
                                 <el-input v-model="editRecordsTemplate.event" auto-complete="off"
                                           placeholder="Brief description of event"></el-input>
@@ -440,7 +440,7 @@
                         });
                     }
                     this.refreshMyRecords();
-                    this.addRecordsTemplate = {};
+                    this.resetAddRecordsTemplate();
                 }).catch(err => {
                     console.log(err);
                     this.$message({
@@ -466,7 +466,7 @@
                         });
                     }
                     this.refreshMyRecords();
-                    this.editRecordsTemplate = {};
+                    this.resetEditRecordsTemplate();
                 }).catch(err => {
                     console.log(err);
                     this.$message({
@@ -488,6 +488,8 @@
                 this.$refs[formName].resetFields();
             },
             resetAddRecordsTemplate(){
+                // do not simply reset template to {} !
+                // this will cause the unpredictable behavior on 'involvedPeople' field
                 this.addRecordsTemplate = {
                     involvedPeople: [],
                     time: '',
@@ -496,10 +498,28 @@
                     comment: ''
                 }
             },
-            cancelEditRecords(){
+            resetEditRecordsTemplate(){
+                // do not simply reset template to {} !
+                // this will cause the unpredictable behavior on 'involvedPeople' field
+                this.editRecordsTemplate = {
+                    involvedPeople: [],
+                    time: '',
+                    totalAmount: '',
+                    event: '',
+                    comment: '',
+                    dbId: ''
+                }
+            },
+            /**
+             * Called when the dialog is closing or 'cancel' button is clicked.
+             * @param done the call back function of 'before-close' attribute of dialog
+             **/
+            cancelEditRecords(done){
                 this.showEditRecordsDialog = false;
-                this.editRecordsTemplate = {};
-                this.showCancelMessage()
+                this.resetForm('editRecordsForm');
+                this.resetEditRecordsTemplate();
+                this.showCancelMessage();
+                done();
             },
             wrapRecordsTemplate(recordsTemplate){
                 recordsTemplate['roomId'] = this.roomId;
@@ -615,7 +635,7 @@
                 this.editRecordsTemplate.time = row.time;
                 this.editRecordsTemplate.event = row.event;
                 this.editRecordsTemplate.comment = row.comment;
-                this.editRecordsTemplate.totalAmount = row.totalAmount;
+                this.editRecordsTemplate.totalAmount = parseFloat(row.totalAmount.substring(1)); // remove currency unit sign
                 this.editRecordsTemplate.dbId = row.dbId;
                 this.showEditRecordsDialog = true;
             },
