@@ -223,8 +223,9 @@
                             </el-collapse-item>
                         </el-collapse>
                     </el-card>
-                    <el-dialog title="Add records" :visible.sync="showAddRecordsDialog">
-                        <el-form :model="addRecordsTemplate" :rules="addRecordsTemplateRules">
+                    <el-dialog title="Add records" :visible.sync="showAddRecordsDialog"
+                               :before-close="cancelAddRecords">
+                        <el-form :model="addRecordsTemplate" :rules="addRecordsTemplateRules" ref="addRecordsForm" :before-close="cancelAddRecords">
                             <el-form-item label="Event" label-width="120px" prop="event">
                                 <el-input v-model="addRecordsTemplate.event" auto-complete="off"
                                           placeholder="Brief description of event"></el-input>
@@ -276,7 +277,7 @@
                             </el-form-item>
                         </el-form>
                         <div slot="footer" class="dialog-footer">
-                            <el-button @click="cancelAddRecords()">Cancel</el-button>
+                            <el-button @click="cancelAddRecords">Cancel</el-button>
                             <el-button type="primary" @click="submitAddRecords()">Confirm</el-button>
                         </div>
                     </el-dialog>
@@ -322,7 +323,7 @@
                             </el-form-item>
                         </el-form>
                         <div slot="footer" class="dialog-footer">
-                            <el-button @click="cancelEditRecords()">Cancel</el-button>
+                            <el-button @click="cancelEditRecords">Cancel</el-button>
                             <el-button type="primary" @click="submitEditRecords()">Confirm</el-button>
                         </div>
                     </el-dialog>
@@ -350,7 +351,7 @@
         {bg: '#faf9d1', font: '#FAC230'},
         {bg: '#d1fad7', font: '#55AF7B'},
         {bg: '#e5d1fa', font: '#8930e8'}
-        ];
+    ];
     export default {
         name: 'HelloWorld',
         data () {
@@ -412,12 +413,12 @@
                 },
                 matrix: [[]],
                 authorNotConfirmed: true,
-                tableColumnWidth:{
-                    id:50,
-                    event:180,
-                    totalAmount:100,
-                    people:180,
-                    author:180,
+                tableColumnWidth: {
+                    id: 50,
+                    event: 180,
+                    totalAmount: 100,
+                    people: 180,
+                    author: 180,
                 }
 
             }
@@ -476,11 +477,24 @@
                 this.showEditRecordsDialog = false;
 
             },
-            cancelAddRecords(){
+            cancelAddRecords(done){
                 this.showAddRecordsDialog = false;
-                this.addRecordsTemplate = {};
-                this.showCancelMessage()
-
+                this.resetForm('addRecordsForm');
+                this.resetAddRecordsTemplate();
+                this.showCancelMessage();
+                done();
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+            resetAddRecordsTemplate(){
+                this.addRecordsTemplate = {
+                    involvedPeople: [],
+                    time: '',
+                    totalAmount: '',
+                    event: '',
+                    comment: ''
+                }
             },
             cancelEditRecords(){
                 this.showEditRecordsDialog = false;
@@ -661,11 +675,11 @@
                 return currencyUnitToSign[this.currencyUnit] + number;
             },
             tagColor(people, isBackground){
-                let idx = this.peopleToId[people]%1;
+                let idx = this.peopleToId[people] % 1;
                 if (isBackground)
                     return peopleIdToColor[idx].bg;
                 let styleStr = 'color:' + peopleIdToColor[idx].font + ';border:1px solid ' +
-                    utils.colorToRGBA(peopleIdToColor[idx].font,0.1);
+                    utils.colorToRGBA(peopleIdToColor[idx].font, 0.1);
                 return styleStr;
             }
         },
@@ -786,7 +800,7 @@
             width: 90%;
         }
 
-        .el-date-editor.el-input, .el-date-editor.el-input__inner{
+        .el-date-editor.el-input, .el-date-editor.el-input__inner {
             width: auto;
         }
     }
