@@ -1,7 +1,9 @@
 <template>
     <div class="hello">
         <el-container>
-            <el-header>Header</el-header>
+            <el-header>
+                <Nav active-index="room" :inside-room="true" :room-name="roomId"></Nav>
+            </el-header>
             <el-container>
                 <!--el-aside>
                     <div style="height: 600px;margin: auto;padding: 10px 50px">
@@ -345,6 +347,7 @@
 <script>
     const utils = require('../utils/utils');
     const account = require('../utils/account');
+    import Nav from '@/components/Nav'; // import Nav
     const SUCCESS_MSG = 'Success!';
     const currencyUnitToSign = {
         USD: '$',
@@ -362,6 +365,9 @@
     ];
     export default {
         name: 'HelloWorld',
+        components:{
+            Nav
+        },
         data () {
             return {
                 roomId: '',
@@ -737,7 +743,7 @@
         filters: {
             /* the filters cannot rely on the staffs in data*/
             formatDate (timeString){
-                if (timeString == '' || timeString == null) return '';
+                if (timeString == '' || timeString == null) return 'N/A';
                 let d = new Date(Date.parse(timeString));
                 return d.toLocaleDateString();
             },
@@ -778,9 +784,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-    h1, h2 {
-        font-weight: normal;
-    }
+
 
     ul {
         list-style-type: none;
@@ -796,10 +800,7 @@
         color: #42b983;
     }
 
-    .el-row {
-        padding: 10px;
-        text-align: left;
-    }
+
 
     .demo-table-expand label {
         color: #99a9bf;
@@ -809,10 +810,6 @@
         margin-right: 0;
         margin-bottom: 0;
         width: 50%;
-    }
-
-    el-form-item {
-        text-align: left;
     }
 
     .box-card {
@@ -831,5 +828,18 @@
         .el-date-editor.el-input, .el-date-editor.el-input__inner {
             width: auto;
         }
+    }
+</style>
+
+<style scoped>
+    h1, h2 {
+        font-weight: normal;
+    }
+    el-form-item {
+        text-align: left;
+    }
+    .el-row {
+        padding: 10px;
+        text-align: left;
     }
 </style>
