@@ -8,31 +8,60 @@
 
                 <div class="center">
                     <el-card class="box-card">
+                        <el-row>
+                            <img src="../assets/pay.svg" width="150px">
+                        </el-row>
+                        <el-row>
+                            <h2>
+                            EasyAccount, easy travel with friends
+                            </h2>
+                        </el-row>
+                        <div style="margin-bottom: 30px"></div>
                         <el-form ref="enterRoomForm">
+                            <div class="login-window">
+                            <el-form-item>
+                                <el-row>
+                                    <el-col>
+                                        <el-input v-model="roomId" placeholder="Room id">
 
-                            <el-row :gutter="20">
-                                <el-col :span="8">
-                                    <el-input v-model="roomId" placeholder="Room id">
-
-                                    </el-input>
-                                </el-col>
-                                <el-col :span="8">
+                                        </el-input>
+                                    </el-col>
+                                </el-row>
+                            </el-form-item>
+                            <el-form-item>
+                            <el-row>
+                                <el-col>
                                     <el-input type="password" v-model="password" placeholder="Password">
                                     </el-input>
                                 </el-col>
-                                <el-col :span="8">
-                                    <el-button type="success" @click="submitRoomId()">Confirm</el-button>
+                            </el-row>
+                            </el-form-item>
+                            <el-form-item>
+                            <el-row>
+                                <el-col :span="24">
+                                    <el-button type="success" @click="submitRoomId()" style="box-shadow: 0 2px 12px 0 rgba(0,0,0,.1)">Enter In</el-button>
                                 </el-col>
                             </el-row>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-row>
+                                    <el-col>
+                                Want to create a new room?
+                                        <el-button type="text">Create new room</el-button>
+                                    </el-col>
+                                </el-row>
+                            </el-form-item>
+                            </div>
                         </el-form>
                     </el-card>
                 </div>
 
-
+                <!--div>Icons made by <a href="https://www.flaticon.com/authors/turkkub" title="turkkub">turkkub</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div-->
             </el-main>
         </el-container>
 
     </div>
+
 </template>
 <script>
     const utils = require('../utils/utils');
@@ -114,7 +143,8 @@
 <style>
     .center {
         margin: auto;
-        width: 600px;
+        width: 500px;
+        text-align: center;
     }
 
 </style>
