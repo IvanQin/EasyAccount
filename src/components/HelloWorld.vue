@@ -35,197 +35,204 @@
                             </el-col>
                         </el-row>
                     </el-card>
-                    <el-card class="box-card">
-                        <el-row>
-                            <el-col :span="8">
-                                <el-button type="primary" icon="el-icon-circle-plus"
-                                           @click="beforeShowAddRecordsDialog()" :disabled="authorNotConfirmed">
-                                    Add record
-                                </el-button>
-                            </el-col>
-                        </el-row>
-                        <el-row>
-                            <el-table
-                                    :data="records"
-                                    style="width: 100%">
-                                <el-table-column type="expand">
+                    <div v-if="authorNotConfirmed == false">
+                        <el-card class="box-card">
+                            <el-row>
+                                <el-col :span="8">
+                                    <el-button type="primary" icon="el-icon-circle-plus"
+                                               @click="beforeShowAddRecordsDialog()" :disabled="authorNotConfirmed">
+                                        Add record
+                                    </el-button>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-table
+                                        :data="records"
+                                        style="width: 100%">
+                                    <el-table-column type="expand">
 
-                                    <el-form label-position="left" inline class="demo-table-expand" slot-scope="props">
-                                        <el-form-item label="ID">
-                                            <span>{{ props.row.id }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Event">
-                                            <span>{{ props.row.event }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Total Amount">
-                                            <span>{{ props.row.totalAmount }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="People">
+                                        <el-form label-position="left" inline class="demo-table-expand"
+                                                 slot-scope="props">
+                                            <el-form-item label="ID">
+                                                <span>{{ props.row.id }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="Event">
+                                                <span>{{ props.row.event }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="Total Amount">
+                                                <span>{{ props.row.totalAmount }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="People">
                                         <span>
                                             <el-tag v-for="p in props.row.people" :key="p.id"
                                                     :style="tagColor(p,false)"
                                                     :color="tagColor(p,true)">{{p}}</el-tag>
                                         </span>
-                                        </el-form-item>
-                                        <el-form-item label="Avg Amount">
-                                            <span>{{ props.row.avgAmount }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Time">
-                                            <span>{{ props.row.time | formatDate }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Comment">
-                                            <span>{{ props.row.comment }}</span>
-                                        </el-form-item>
-                                    </el-form>
+                                            </el-form-item>
+                                            <el-form-item label="Avg Amount">
+                                                <span>{{ props.row.avgAmount }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="Time">
+                                                <span>{{ props.row.time | formatDate }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="Comment">
+                                                <span>{{ props.row.comment }}</span>
+                                            </el-form-item>
+                                        </el-form>
 
-                                </el-table-column>
-                                <el-table-column
-                                        prop="id"
-                                        label="ID"
-                                        :width="tableColumnWidth.id">
-                                </el-table-column>
-                                <el-table-column
-                                        prop="event"
-                                        label="Event"
-                                        :width="tableColumnWidth.event">
-                                </el-table-column>
-                                <el-table-column
-                                        prop="totalAmount"
-                                        label="Total Amount"
-                                        :width="tableColumnWidth.totalAmount"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                        prop="people"
-                                        label="People"
-                                        :width="tableColumnWidth.people"
-                                >
-                                    <template slot-scope="props">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="id"
+                                            label="ID"
+                                            :width="tableColumnWidth.id">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="event"
+                                            label="Event"
+                                            :width="tableColumnWidth.event">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="totalAmount"
+                                            label="Total Amount"
+                                            :width="tableColumnWidth.totalAmount"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="people"
+                                            label="People"
+                                            :width="tableColumnWidth.people"
+                                    >
+                                        <template slot-scope="props">
                                         <span><el-tag v-for="p in props.row.people" :key="p.id"
                                                       :style="tagColor(p,false)"
                                                       :color="tagColor(p,true)">{{p}}</el-tag></span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="Operation">
-                                    <template slot-scope="props">
-                                        <el-button
-                                                size="mini"
-                                                type="info"
-                                                @click="handleEdit(props.$index, props.row)" style="margin: 2px 2px">
-                                            Edit
-                                        </el-button>
-                                        <el-button
-                                                size="mini"
-                                                type="danger"
-                                                @click="handleDelete(props.$index, props.row)" style="margin: 2px 2px">
-                                            Delete
-                                        </el-button>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="Operation">
+                                        <template slot-scope="props">
+                                            <el-button
+                                                    size="mini"
+                                                    type="info"
+                                                    @click="handleEdit(props.$index, props.row)"
+                                                    style="margin: 2px 2px">
+                                                Edit
+                                            </el-button>
+                                            <el-button
+                                                    size="mini"
+                                                    type="danger"
+                                                    @click="handleDelete(props.$index, props.row)"
+                                                    style="margin: 2px 2px">
+                                                Delete
+                                            </el-button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
 
-                        </el-row>
-                    </el-card>
-                    <el-card class="box-card">
-                        <el-row>
-                            <el-table
-                                    :data="totalRecords"
-                                    style="width: 100%">
-                                <el-table-column type="expand">
+                            </el-row>
+                        </el-card>
+                        <el-card class="box-card">
+                            <el-row>
+                                <el-table
+                                        :data="totalRecords"
+                                        style="width: 100%">
+                                    <el-table-column type="expand">
 
-                                    <el-form label-position="left" inline class="demo-table-expand" slot-scope="props">
-                                        <el-form-item label="ID">
-                                            <span>{{ props.row.id }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Author">
-                                            <span>{{ props.row.author }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Event">
-                                            <span>{{ props.row.event }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Total Amount">
-                                            <span>{{ props.row.totalAmount }}</span>
-                                        </el-form-item>
-                                        <!--el-form-item label="People">
-                                            <span>{{ props.row.people }}</span>
-                                        </el-form-item-->
-                                        <el-form-item label="People">
+                                        <el-form label-position="left" inline class="demo-table-expand"
+                                                 slot-scope="props">
+                                            <el-form-item label="ID">
+                                                <span>{{ props.row.id }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="Author">
+                                                <span>{{ props.row.author }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="Event">
+                                                <span>{{ props.row.event }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="Total Amount">
+                                                <span>{{ props.row.totalAmount }}</span>
+                                            </el-form-item>
+                                            <!--el-form-item label="People">
+                                                <span>{{ props.row.people }}</span>
+                                            </el-form-item-->
+                                            <el-form-item label="People">
                                         <span>
                                             <el-tag v-for="p in props.row.people" :key="p.id" :style="tagColor(p,false)"
                                                     :color="tagColor(p,true)">{{p}}</el-tag>
                                         </span>
-                                        </el-form-item>
-                                        <el-form-item label="Avg Amount">
-                                            <span>{{ props.row.avgAmount }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Time">
-                                            <span>{{ props.row.time | formatDate }}</span>
-                                        </el-form-item>
-                                        <el-form-item label="Comment">
-                                            <span>{{ props.row.comment }}</span>
-                                        </el-form-item>
-                                    </el-form>
+                                            </el-form-item>
+                                            <el-form-item label="Avg Amount">
+                                                <span>{{ props.row.avgAmount }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="Time">
+                                                <span>{{ props.row.time | formatDate }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="Comment">
+                                                <span>{{ props.row.comment }}</span>
+                                            </el-form-item>
+                                        </el-form>
 
-                                </el-table-column>
-                                <el-table-column
-                                        prop="id"
-                                        label="ID"
-                                        :width="tableColumnWidth.id">
-                                </el-table-column>
-                                <el-table-column
-                                        prop="event"
-                                        label="Event"
-                                        :width="tableColumnWidth.event">
-                                </el-table-column>
-                                <el-table-column
-                                        prop="totalAmount"
-                                        label="Total Amount"
-                                        :width="tableColumnWidth.totalAmount"
-                                >
-                                </el-table-column>
-                                </el-table-column>
-                                <el-table-column
-                                        prop="people"
-                                        label="People"
-                                        :width="tableColumnWidth.people"
-                                >
-                                    <template slot-scope="props">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="id"
+                                            label="ID"
+                                            :width="tableColumnWidth.id">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="event"
+                                            label="Event"
+                                            :width="tableColumnWidth.event">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="totalAmount"
+                                            label="Total Amount"
+                                            :width="tableColumnWidth.totalAmount"
+                                    >
+                                    </el-table-column>
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="people"
+                                            label="People"
+                                            :width="tableColumnWidth.people"
+                                    >
+                                        <template slot-scope="props">
                                         <span><el-tag v-for="p in props.row.people" :key="p.id"
                                                       :style="tagColor(p,false)"
                                                       :color="tagColor(p,true)">{{p}}</el-tag></span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="author" label="Author" :width="tableColumnWidth.author">
+
+                                    </el-table-column>
+                                </el-table>
+
+                            </el-row>
+                        </el-card>
+                        <el-card class="box-card">
+                            <el-collapse accordion>
+                                <el-collapse-item v-for="info in accountInfo" :key="info.id">
+                                    <template slot="title">
+                                        <div v-if="info.giveMoney">
+                                            Give
+                                            <el-tag>{{formMoney(info.amount)}}</el-tag>
+                                            to
+                                            <el-tag>{{info.name}}</el-tag>
+                                        </div>
+                                        <div v-else>
+                                            Request
+                                            <el-tag>{{formMoney(info.amount)}}</el-tag>
+                                            from
+                                            <el-tag>{{info.name}}</el-tag>
+                                        </div>
                                     </template>
-                                </el-table-column>
-                                <el-table-column prop="author" label="Author" :width="tableColumnWidth.author">
 
-                                </el-table-column>
-                            </el-table>
-
-                        </el-row>
-                    </el-card>
-                    <el-card class="box-card">
-                        <el-collapse accordion>
-                            <el-collapse-item v-for="info in accountInfo" :key="info.id">
-                                <template slot="title">
-                                    <div v-if="info.giveMoney">
-                                        Give
-                                        <el-tag>{{formMoney(info.amount)}}</el-tag>
-                                        to
-                                        <el-tag>{{info.name}}</el-tag>
-                                    </div>
-                                    <div v-else>
-                                        Request
-                                        <el-tag>{{formMoney(info.amount)}}</el-tag>
-                                        from
-                                        <el-tag>{{info.name}}</el-tag>
-                                    </div>
-                                </template>
-
-                            </el-collapse-item>
-                        </el-collapse>
-                    </el-card>
+                                </el-collapse-item>
+                            </el-collapse>
+                        </el-card>
+                    </div>
                     <el-dialog title="Add records" :visible.sync="showAddRecordsDialog"
                                :before-close="cancelAddRecords">
-                        <el-form :model="addRecordsTemplate" :rules="addRecordsTemplateRules" ref="addRecordsForm" :before-close="cancelAddRecords">
+                        <el-form :model="addRecordsTemplate" :rules="addRecordsTemplateRules" ref="addRecordsForm"
+                                 :before-close="cancelAddRecords">
                             <el-form-item label="Event" label-width="120px" prop="event">
                                 <el-input v-model="addRecordsTemplate.event" auto-complete="off"
                                           placeholder="Brief description of event"></el-input>
@@ -282,7 +289,8 @@
                         </div>
                     </el-dialog>
 
-                    <el-dialog title="Edit records" :visible.sync="showEditRecordsDialog" :before-close="cancelEditRecords">
+                    <el-dialog title="Edit records" :visible.sync="showEditRecordsDialog"
+                               :before-close="cancelEditRecords">
                         <el-form :model="editRecordsTemplate" ref="editRecordsForm" :rules="addRecordsTemplateRules">
                             <el-form-item label="Event" label-width="120px" prop="event">
                                 <el-input v-model="editRecordsTemplate.event" auto-complete="off"
