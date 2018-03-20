@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import Entrance from '@/components/Entrance'
 import Forbidden from '@/components/Forbidden'
 import NotFound from '@/components/NotFound'
+import Create from '@/components/Create'
 
 Vue.use(Router);
 const utils = require('../utils/utils');
@@ -46,6 +47,11 @@ const router = new Router({
             path: '/entrance',
             name: 'Entrance',
             component: Entrance
+        },
+        {
+            path:'/create',
+            name:'Create',
+            component: Create
         },
         {
             path: '/403',
