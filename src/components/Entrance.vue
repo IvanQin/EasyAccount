@@ -49,7 +49,7 @@
                                     <el-row>
                                         <el-col>
                                             Want to create a new room?
-                                            <el-button type="text">Create new room</el-button>
+                                            <router-link :to="{name:'Create'}"><el-button type="text">Create new room</el-button></router-link>
                                         </el-col>
                                     </el-row>
                                 </div>

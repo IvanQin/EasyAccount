@@ -58,7 +58,9 @@
                                 <el-button type="warning" @click="resetRoomForm">Reset</el-button>
                             </el-col-->
                             <el-col :span="24" style="text-align: center;">
-                                <el-button type="success" @click="submitRoomForm('addRoomForm')">Submit</el-button>
+                                <el-button type="success" @click="submitRoomForm('addRoomForm')"
+                                           style="box-shadow: 0 2px 12px 0 rgba(0,0,0,.1)"
+                                >Submit</el-button>
                             </el-col>
                         </el-row>
 
