@@ -25,7 +25,6 @@ const router = new Router({
                         roomId: roomId
                     }
                 });
-                console.log(validateTokenRequest);
                 Vue.prototype.$http.post('/api/validate-token', {dbDocument: validateTokenRequest}).then(res => {
                     let receivedData = res.data;
                     if (receivedData.status == utils.SUCCESS_MSG) {
@@ -33,7 +32,10 @@ const router = new Router({
                     }
                     else {
                         next({
-                            name: 'Forbidden'
+                            name: 'Forbidden',
+                            params: {
+                                errorMessage: receivedData.status
+                            }
                         });
                     }
                 });
@@ -49,8 +51,8 @@ const router = new Router({
             component: Entrance
         },
         {
-            path:'/create',
-            name:'Create',
+            path: '/create',
+            name: 'Create',
             component: Create
         },
         {
