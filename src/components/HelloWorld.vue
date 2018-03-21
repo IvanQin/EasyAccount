@@ -234,7 +234,7 @@
                     <el-dialog title="Add records" :visible.sync="showAddRecordsDialog"
                                :before-close="cancelAddRecords">
                         <el-form :model="addRecordsTemplate" :rules="addRecordsTemplateRules" ref="addRecordsForm"
-                                 :before-close="cancelAddRecords">
+                                 >
                             <el-form-item label="Event" label-width="120px" prop="event">
                                 <el-input v-model="addRecordsTemplate.event" auto-complete="off"
                                           placeholder="Brief description of event"></el-input>
