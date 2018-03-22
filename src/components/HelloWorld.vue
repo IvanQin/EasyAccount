@@ -50,7 +50,9 @@
                             <el-row>
                                 <el-table
                                         :data="records"
-                                        style="width: 100%">
+                                        style="width: 100%"
+                                        empty-text="No record."
+                                >
                                     <el-table-column type="expand">
 
                                         <el-form label-position="left" inline class="demo-table-expand"
@@ -133,10 +135,18 @@
                             </el-row>
                         </el-card>
                         <el-card class="box-card">
+                            <el-alert
+                                    show-icon
+                                    title="The items below are the records added by all of the people in this room."
+                                    type="info"
+                            >
+                            </el-alert>
                             <el-row>
                                 <el-table
                                         :data="totalRecords"
-                                        style="width: 100%">
+                                        style="width: 100%"
+                                        empty-text="No record."
+                                >
                                     <el-table-column type="expand">
 
                                         <el-form label-position="left" inline class="demo-table-expand"
@@ -234,7 +244,7 @@
                     <el-dialog title="Add records" :visible.sync="showAddRecordsDialog"
                                :before-close="cancelAddRecords">
                         <el-form :model="addRecordsTemplate" :rules="addRecordsTemplateRules" ref="addRecordsForm"
-                                 >
+                        >
                             <el-form-item label="Event" label-width="120px" prop="event">
                                 <el-input v-model="addRecordsTemplate.event" auto-complete="off"
                                           placeholder="Brief description of event"></el-input>
@@ -351,7 +361,9 @@
     const SUCCESS_MSG = 'Success!';
     const currencyUnitToSign = {
         USD: '$',
-        CNY: '¥'
+        CNY: '¥',
+        EUR: '€',
+        GBP: '￡'
     };
     const peopleIdToColor = [
         {bg: '#FFFFFF', font: '#545454'},
@@ -365,7 +377,7 @@
     ];
     export default {
         name: 'HelloWorld',
-        components:{
+        components: {
             Nav
         },
         data () {
@@ -430,7 +442,7 @@
                 tableColumnWidth: {
                     id: 50,
                     event: 180,
-                    totalAmount: 100,
+                    totalAmount: 120,
                     people: 180,
                     author: 180,
                 }
@@ -684,10 +696,15 @@
                 });
             },
             confirmAuthor(){
+                if (this.tmpAuthor == '') {
+                    this.$message.warning("Please choose your name first.");
+                    return;
+                }
                 this.author = this.tmpAuthor;
                 this.authorNotConfirmed = false; // enabled the add record button
-                this.$message.info("You are chosen as " + this.author + ". Welcome ! ");
+                this.$message.info("Welcome , " + this.author + " ! ");
                 //TODO change UI, delete input
+
                 this.refreshMyRecords();
             },
             showCancelMessage(){
@@ -795,12 +812,12 @@
         display: inline-block;
         margin: 0 10px;
     }
-/*
-    a {
-        color: #42b983;
-    }
-*/
 
+    /*
+        a {
+            color: #42b983;
+        }
+    */
 
     .demo-table-expand label {
         color: #99a9bf;
@@ -828,6 +845,11 @@
         .el-date-editor.el-input, .el-date-editor.el-input__inner {
             width: auto;
         }
+
+        .el-main {
+            padding: 0;
+
+        }
     }
 </style>
 
@@ -835,9 +857,11 @@
     h1, h2 {
         font-weight: normal;
     }
+
     el-form-item {
         text-align: left;
     }
+
     .el-row {
         padding: 10px;
         text-align: left;

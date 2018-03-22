@@ -22,7 +22,7 @@
                                 <div class="login-item">
                                     <el-row>
                                         <el-col>
-                                            <el-input v-model="roomId" placeholder="Room id">
+                                            <el-input v-model="roomId" placeholder="Room Id">
 
                                             </el-input>
                                         </el-col>

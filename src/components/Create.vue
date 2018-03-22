@@ -22,7 +22,7 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item label="Currency Unit" :label-width="labelWidth" prop="currencyUnit">
-                                <el-select v-model="addRoomTemplate.currencyUnit" placeholder="choose currency unit">
+                                <el-select v-model="addRoomTemplate.currencyUnit" placeholder="Choose currency unit">
                                     <el-option
                                             v-for="p in currencyUnitMap"
                                             :key="p.id"
@@ -41,7 +41,8 @@
                                         filterable
                                         allow-create
                                         default-first-option
-                                        placeholder="Add travelers">
+                                        no-data-text="Just type names."
+                                        placeholder="Enter travelers' name">
                                     <el-option
                                             v-for="p in people"
                                             :key="p.id"
@@ -136,7 +137,7 @@
 
             return {
                 currencyUnitMap: currencyUnitMap,
-                people: ['Default'],
+                people: [],
                 addRoomTemplate: {
                     roomId: '',
                     password: '',
