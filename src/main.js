@@ -11,7 +11,7 @@ import Cookies from 'js-cookie'
 Vue.prototype.$http = axios;
 Vue.use(ElementUI);
 Vue.config.productionTip = false;
-axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.baseURL = 'http://106.15.185.184:3000';
 Vue.prototype.$cookies = Cookies;
 
 // Object.prototype.isEmpty = function(){
