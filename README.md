@@ -61,7 +61,8 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
     + [Tutorial](http://blog.csdn.net/sinat_17775997/article/details/63686951) use `next({...})`
     + e.g. ```next({name: 'Forbidden'});```
 - How to link components?
-    + [Tutorial](https://www.jianshu.com/p/7c5ccfac3fa8) A detailed vue demo.
+    + [Tutorial](https://www.ls
+    jianshu.com/p/7c5ccfac3fa8) A detailed vue demo.
     
    
 ### Knowledge
@@ -79,5 +80,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 - [js-md5](https://www.npmjs.com/package/js-md5)
 
 ### TODO
--[x] Core computing strategy
--[ ] Data visualization (using graph to show the payment date)
+
+- [x] Core computing strategy
+- [ ] Find bugs in cookie authorization
+- [ ] Data visualization (using graph to show the payment date)
